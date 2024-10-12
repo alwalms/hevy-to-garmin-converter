@@ -2,27 +2,30 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [convertedFile, setConvertedFile] = useState(null);
+  // State for holding the converted file URL
+  const [convertedFile, setConvertedFile] = useState<string | null>(null);
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  // Handle file upload event with the correct type
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];  // Check for files array and get the first file
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = function (e) {
-      const fileContent = e.target.result;
+      const fileContent = e.target?.result;  // Ensure result is not null
+      if (typeof fileContent === 'string') {
+        // Example conversion: Reverse the text content
+        const convertedContent = fileContent.split('').reverse().join('');
 
-      // Example conversion: Reverse the text content (replace with actual logic)
-      const convertedContent = fileContent.split('').reverse().join('');
+        // Create a Blob for the converted file
+        const blob = new Blob([convertedContent], { type: 'text/plain' });
 
-      // Create a Blob for the converted file
-      const blob = new Blob([convertedContent], { type: 'text/plain' });
-
-      // Create a URL for the Blob to use as a downloadable link
-      setConvertedFile(URL.createObjectURL(blob));
+        // Create a URL for the Blob to use as a downloadable link
+        setConvertedFile(URL.createObjectURL(blob));
+      }
     };
 
-    reader.readAsText(file);  // Adjust this depending on the file type
+    reader.readAsText(file);  // Assuming you're working with a text file
   };
 
   return (
